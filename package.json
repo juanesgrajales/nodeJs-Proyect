@@ -1,15 +1,16 @@
 {
   "name": "proyect",
   "version": "1.0.0",
-  "description": "",
+  "description": "API para gestionar los productos de la tienda de don Pedro",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
-    "dev": "node --watch app.js"
+    "dev": "node --watch app.js",
+    "saludo": "Hola, soy un script"
   },
   "keywords": [],
-  "author": "",
+  "author": "Juan Esteban Grajales",
   "license": "ISC",
   "type": "module",
   "dependencies": {
