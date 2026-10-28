@@ -1,0 +1,1 @@
+console.log("Hola, este es un ejemplo de código en JavaScript.");

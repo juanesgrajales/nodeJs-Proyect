@@ -2,8 +2,12 @@ export const formatearPrecio =(valor)=>{
     return `$ ${valor.toLocaleString("es-CO")}`;
 }
 
-export function formatearPrecio2(valor){
-    return `${valor}`
+export const totalIVA = (valor) => {
+    return valor + calcularIVA(valor);
+}
+
+export const calcularIVA = (valor) => {
+    return Math.round(valor * 0.19);
 }
 
 export const formatearNombre = (texto)=>{
