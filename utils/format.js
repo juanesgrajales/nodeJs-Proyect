@@ -14,3 +14,9 @@ export const formatearNombre = (texto)=>{
     return `${texto.toUpperCase()}`
 }
 
+export const aplicarDescuento = (valor, porcentaje) => {
+  const descuento = (valor * porcentaje) / 100;
+  const precioFinal = valor - descuento;
+  return precioFinal
+};
+

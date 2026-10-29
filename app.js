@@ -1,28 +1,71 @@
 import pc from "picocolors";
-import {formatearPrecio, formatearNombre} from "./utils/format.js"
 import { productos } from "./data/product.js";
-import { buscarporId, listarAgotados, valorInventario, listarPorCategoria } from "./services/inventario.js";
+import { formatearPrecio } from "./utils/format.js";
+import {
+  listarAgotados,
+  valorInventario,
+  buscarPorNombre,
+  vender,
+} from "./services/inventario.js";
 
-console.log("Hello, World! desde node js");//start
-console.log("API Mi Tienda de Barrio Aprendiz: Juan Esteban Grjales”");//run dev 
+const comando = process.argv[2];
+const valor1 = process.argv[3];
+const valor2 = process.argv[4];
 
-//uso de libreria picocolors para cambiar el color del texto en la consola
-console.log(pc.blue("“Bienvenido"));
-console.log(pc.red("Error de prueba"));
+console.log(pc.green("===== TIENDA DON PEDRO ====="));
 
-console.log(formatearPrecio(10400));
-
-console.log(formatearNombre("leche 1 l"));
-
-console.table(productos);
-console.log(`la tienda tiene ${productos.length} productos`);
-
-for (const  producto of productos ){
-    console.log(producto.nombre+" - $"+ (producto.precio))
+if (comando === "todos") {
+  console.table(productos);
 }
+else if (comando === "agotados") {
+  for (const producto of listarAgotados()) {
+    console.log(`AGOTADO: ${producto.nombre}`);
+  }
+}
+else if (comando === "buscar") {
+  const texto = valor1 === undefined ? "" : valor1.trim();
+  if (!texto) {
+    console.error(pc.red("Uso: npm start -- buscar <nombre>"));
+    process.exitCode = 1;
+  } else {
+    const resultados = buscarPorNombre(texto);
+    if (resultados.length === 0) {
+      console.log(`No hay productos que contengan "${texto}"`);
+    } else {
+      for (const producto of resultados) {
+        console.log(
+          `Encontrado: ${producto.nombre}: ${formatearPrecio(producto.precio)} (quedan ${producto.cantidad})`
+        );
+      }
+    }
+  }
+}
+else if (comando === "valor") {
+  console.log(`Valor del inventario: ${formatearPrecio(valorInventario())}`);
+}
+else if (comando === "vender" && valor1 !== undefined && valor2 !== undefined) {
+  const id = Number(valor1);
+  const unidades = Number(valor2);
 
-console.log("producto 3: ", buscarporId(3).nombre);
-console.log("Agotados: ",listarAgotados().length);
-console.log("Valor del inventario: ",formatearPrecio(valorInventario()))
-
-console.log("Productos de granos:", listarPorCategoria("granos").length);
+  if (!Number.isInteger(id) || !Number.isInteger(unidades) || unidades <= 0) {
+    console.error(pc.red("Uso: npm start -- vender <id-producto> <unidades>"));
+    process.exitCode = 1;
+  } else {
+    const resultado = vender(id, unidades);
+    if (resultado.startsWith("ERROR:")) {
+      console.error(pc.red(resultado));
+      process.exitCode = 1;
+    } else {
+      console.log(pc.green(resultado));
+    }
+  }
+} else {
+  console.log(
+    "Comandos disponibles:","\n",
+    "npm start -- todos","\n",
+    "npm start -- agotados ","\n",
+    "npm start -- buscar <nombre> ","\n",
+    "npm start -- valor ","\n",
+    "npm start -- vender <id-producto> <unidades>"
+  );
+}
