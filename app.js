@@ -6,6 +6,7 @@ import {
   valorInventario,
   buscarPorNombre,
   vender,
+  listarPorCategoria
 } from "./services/inventario.js";
 
 const comando = process.argv[2];
@@ -16,19 +17,18 @@ console.log(pc.green("===== TIENDA DON PEDRO ====="));
 
 if (comando === "todos") {
   console.table(productos);
-}
-else if (comando === "agotados") {
+} else if (comando === "agotados") {
   for (const producto of listarAgotados()) {
     console.log(`AGOTADO: ${producto.nombre}`);
   }
-}
-else if (comando === "buscar") {
+} else if (comando === "buscar") {
   const texto = valor1 === undefined ? "" : valor1.trim();
+
   if (!texto) {
     console.error(pc.red("Uso: npm start -- buscar <nombre>"));
-    process.exitCode = 1;
   } else {
     const resultados = buscarPorNombre(texto);
+
     if (resultados.length === 0) {
       console.log(`No hay productos que contengan "${texto}"`);
     } else {
@@ -39,33 +39,49 @@ else if (comando === "buscar") {
       }
     }
   }
-}
-else if (comando === "valor") {
+} else if (comando === "valor") {
   console.log(`Valor del inventario: ${formatearPrecio(valorInventario())}`);
-}
-else if (comando === "vender" && valor1 !== undefined && valor2 !== undefined) {
+} else if (comando === "vender") {
   const id = Number(valor1);
   const unidades = Number(valor2);
 
   if (!Number.isInteger(id) || !Number.isInteger(unidades) || unidades <= 0) {
     console.error(pc.red("Uso: npm start -- vender <id-producto> <unidades>"));
-    process.exitCode = 1;
   } else {
     const resultado = vender(id, unidades);
+
     if (resultado.startsWith("ERROR:")) {
       console.error(pc.red(resultado));
-      process.exitCode = 1;
     } else {
-      console.log(pc.green(resultado));
+      console.log((resultado));
+    }
+  }
+} else if (comando === "categoria") {
+  const categoria = valor1 === undefined ? "" : valor1.trim();
+
+  if (!categoria) {
+    console.error(pc.red("Uso: npm start -- categoria <nombre-categoria>"));
+  } else {
+    const resultados = listarPorCategoria(categoria);
+    if (resultados.length === 0) {
+      console.log(`No hay productos en la categoría "${categoria}"`);
+    } else {
+      console.log(`Categoría: ${categoria}`);
+      for (const producto of resultados) {
+        console.log(
+          `${producto.nombre}: ${formatearPrecio(producto.precio)} (quedan ${producto.cantidad})`
+        );
+      }
     }
   }
 } else {
   console.log(
-    "Comandos disponibles:","\n",
-    "npm start -- todos","\n",
-    "npm start -- agotados ","\n",
-    "npm start -- buscar <nombre> ","\n",
-    "npm start -- valor ","\n",
-    "npm start -- vender <id-producto> <unidades>"
+    "Comandos disponibles:\n",
+    "npm start -- todos\n",
+    "npm start -- agotados\n",
+    "npm start -- buscar <nombre>\n",
+    "npm start -- valor\n",
+    "npm start -- vender <id-producto> <unidades>\n",
+    "npm start -- categoria <nombre-categoria>"
   );
 }
